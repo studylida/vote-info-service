@@ -1,13 +1,15 @@
+version: '3.8'
+
 services:
   mysql:
     image: mysql:8.0
     container_name: mysql-container
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: vote_info_db
-      MYSQL_USER: vote_user
-      MYSQL_PASSWORD: vote_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -17,7 +19,6 @@ services:
     networks:
       - vote-net
 
-
   vote-info-service:
     build:
       context: .
@@ -25,9 +26,12 @@ services:
     depends_on:
       - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vote_info_db
-      SPRING_DATASOURCE_USERNAME: vote_user
-      SPRING_DATASOURCE_PASSWORD: vote_password
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      API_SERVICE_KEY: ${API_SERVICE_KEY}
+      SPRING_SECURITY_USER_NAME: ${SPRING_SECURITY_USER_NAME}
+      SPRING_SECURITY_USER_PASSWORD: ${SPRING_SECURITY_USER_PASSWORD}
     ports:
       - "8080:8080"
     networks:

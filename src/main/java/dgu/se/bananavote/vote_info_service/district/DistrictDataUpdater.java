@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -37,6 +39,8 @@ public class DistrictDataUpdater {
         this.objectMapper = objectMapper;
     }
 
+    @Transactional
+    @Scheduled(cron = "0 5 * * * *")
     public void updateDistrictData() {
         int pageNo = 1;
         int totalPages = 1;
@@ -78,8 +82,8 @@ public class DistrictDataUpdater {
                 pageNo++;
             }
 
-            // Save all collected districts to SQL file
-            saveDataAsSql(allDistricts);
+//            // Save all collected districts to SQL file
+//            saveDataAsSql(allDistricts);
 
         } catch (URISyntaxException e) {
             System.err.println("URI Syntax Error: " + e.getMessage());
@@ -88,37 +92,37 @@ public class DistrictDataUpdater {
         }
     }
 
-    public void saveDataAsSql(Iterable<District> districts) {
-        String outputDir = "/app/output";
-        String filePath = outputDir + "/init_districts.sql";
-
-        try {
-            // Ensure the directory exists
-            File directory = new File(outputDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-
-            // Write the SQL file
-            try (FileWriter writer = new FileWriter(filePath)) {
-                writer.write("CREATE TABLE IF NOT EXISTS districts (\n" +
-                        "  id INT AUTO_INCREMENT PRIMARY KEY,\n" +
-                        "  sdName VARCHAR(255),\n" +
-                        "  wiwName VARCHAR(255),\n" +
-                        "  sggName VARCHAR(255)\n" +
-                        ");\n\n");
-
-                for (District district : districts) {
-                    writer.write(String.format(
-                            "INSERT INTO districts (sdName, wiwName, sggName) VALUES ('%s', '%s', '%s');\n",
-                            district.getSdName(), district.getWiwName(), district.getSggName()
-                    ));
-                }
-
-                System.out.println("Data saved as " + filePath);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void saveDataAsSql(Iterable<District> districts) {
+//        String outputDir = "/app/output";
+//        String filePath = outputDir + "/init_districts.sql";
+//
+//        try {
+//            // Ensure the directory exists
+//            File directory = new File(outputDir);
+//            if (!directory.exists()) {
+//                directory.mkdirs();
+//            }
+//
+//            // Write the SQL file
+//            try (FileWriter writer = new FileWriter(filePath)) {
+//                writer.write("CREATE TABLE IF NOT EXISTS districts (\n" +
+//                        "  id INT AUTO_INCREMENT PRIMARY KEY,\n" +
+//                        "  sdName VARCHAR(255),\n" +
+//                        "  wiwName VARCHAR(255),\n" +
+//                        "  sggName VARCHAR(255)\n" +
+//                        ");\n\n");
+//
+//                for (District district : districts) {
+//                    writer.write(String.format(
+//                            "INSERT INTO districts (sdName, wiwName, sggName) VALUES ('%s', '%s', '%s');\n",
+//                            district.getSdName(), district.getWiwName(), district.getSggName()
+//                    ));
+//                }
+//
+//                System.out.println("Data saved as " + filePath);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
